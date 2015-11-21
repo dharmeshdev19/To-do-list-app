@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Advanced To Do List App</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="_css/reset.css"/>
+    <link rel="stylesheet" href="_css/main.css"/>
+
+</head>
+
+<body>
+    <div id="container">
+        <header>
+            <h1>All Tasks</h1>
+        </header>
+
+        <div id="main_content" class="theList">
+
+
+        </div> <!-- end of main_content -->
+    </div> <!-- end of container -->
+
+    <div class="add_clear">
+        <input type="text" id="toDoItem" name="toDoItem" class="toDoItem" autofocus/>
+        <a href="#" class="push_button blue add_new" id="add_new"><img src="_img/add_new_icon.png" alt=""/>Add New</a>
+        <a href="#" class="push_button red clear_all" id="clear_all"><img src="_img/clear_all_icon.png" alt=""/>Clear All</a>
+    </div> <!-- end of add clear div -->
+
+
+<script src="_js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+       var newListItem;
+        var theList = $('.theList');
+        var toDoItem = $('#toDoItem');
+
+        $('#add_new').on('click', function(e) {
+            e.preventDefault();
+            if( ($(toDoItem).val()) == "" ){
+                alert("Task Input Field cannot be kept blank");
+
+            }   else{
+               var theValue = $('#toDoItem').val();
+
+                newListItem = '<div class="row"><div class="check"><img src="_img/uncheck.png" alt="check_mark_placeholder"/></div><div class="text"><input type="text" class="list_item" value="' + theValue + '"/></div><div class="remove"><a href="#" class="removeListItem">X</a></div><div class="date_of_creation"><p class="date"></p></div>';
+
+                $(theList).append(newListItem);
+
+                var date = getListDate();
+                $('.row').find('p.date').text(date);
+
+                localStorage.setItem('todoListPlus', theList.html());
+
+            }
+
+            $(toDoItem).val('');
+            $(toDoItem).focus();
+        });
+
+        $(theList).on('click','img', function(){
+
+            if ( $(this).attr("src") == "_img/uncheck.png" ){
+
+                $(this).attr("src", "_img/checked.png");
+
+                $(this).parents('.row').find('input').addClass('done');
+                $(this).parents('.row').find('input').attr('disabled', true);
+                $(this).parents('.row').find('p.date').addClass('done');
+                localStorage.setItem('todoListPlus', theList.html());
+            } else {
+
+                $(this).attr("src", "_img/uncheck.png");
+                $(this).parents('.row').find('input').removeClass('done');
+                $(this).parents('.row').find('input').attr('disabled', false);
+                $(this).parents('.row').find('p.date').removeClass('done');
+                localStorage.setItem('todoListPlus', theList.html());
+            }
+        });
+
+
+        $(theList).on('click', '.removeListItem', function(e){
+            e.preventDefault();
+            $(this).parents('.row').remove();
+            localStorage.setItem('todoListPlus', theList.html());
+        });
+
+
+        $(theList).on('mouseover', '.row', function(){
+            var $thisA = $(this).find('a');
+            $thisA.css('display','inline-block');
+        });
+
+        $(theList).on('mouseout', '.row', function(){
+            var $thisA = $(this).find('a');
+            $thisA.css('display','none');
+        });
+
+
+
+        $('input[type="text"]').on('keydown', function(e) {
+            var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+            if(key == 13) {
+                e.preventDefault();
+                $(this).next().focus();
+            }
+        });
+
+        $(theList).on('change', '.list_item', function(e){
+            var currentValue = $(this).val();
+            $(this).attr('value', currentValue);
+
+            localStorage.setItem('todoListPlus', theList.html());
+        });
+
+        /* Clear All Functionality */
+
+        $('.clear_all').on('click', function(e){
+            e.preventDefault();
+
+            if($(theList).children().length > 0){
+                $('.theList').children().remove();
+                $(toDoItem).val('');
+
+                $(toDoItem).focus();
+                localStorage.setItem('todoListPlus', theList.html());
+            } else{
+                alert('No Task Found in the List to Delete');
+            }
+
+        });
+
+
+        /* list Date function */
+
+        function getListDate(){
+
+            var month_array = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+            var new_date = new Date();
+
+            var month = new_date.getMonth();
+
+            var month_name = month_array[month];
+
+            var date = new_date.getDate();
+
+            var month_date = month_name + " " + date;
+
+            return month_date;
+
+        }
+
+		
+        function load_to_do(){
+            if(localStorage.getItem('todoListPlus')){
+                theList.html(localStorage.getItem('todoListPlus'));
+            }
+
+        }
+
+        load_to_do();
+
+    });
+</script>
+
+</body>
+</html>
